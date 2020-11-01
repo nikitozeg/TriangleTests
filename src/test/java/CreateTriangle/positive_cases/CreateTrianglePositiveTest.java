@@ -1,3 +1,5 @@
+package CreateTriangle.positive_cases;
+
 import io.restassured.http.ContentType;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.DataProvider;
@@ -10,60 +12,18 @@ import java.util.List;
 import static io.restassured.RestAssured.given;
 import static org.testng.Assert.*;
 
-public class CreateTriangleAndGetPerimeterTest {
+public class CreateTrianglePositiveTest {
 
     String BASE_URI = "https://qa-quiz.natera.com";
     String TRIANGLE = "/triangle/";
     List<String> list = new ArrayList<String>();
 
 
-    @DataProvider(name = "negative-cases")
-    public Object[][] negativeCases() {
-        return new Object[][]{
-                {"0,0,0", "Cannot process input"}, //should not be created
-                {"2,1,1", "Cannot process input"}, //should not be created
-                {"1,2,1", "Cannot process input"}, //should not be created
-                {"1,1,2", "Cannot process input"}, //should not be created
-                {"0.2,0.1,0.1", "Cannot process input"}, //should not be created
-                {"0.1,0.2,0.1", "Cannot process input"}, //should not be created
-                {"0.1,0.1,0.2", "Cannot process input"}, //should not be created
-                {";;", "Cannot process input"}, //
-                {"1,,", "Cannot process input"}, //
-                {",0,", "Cannot process input"}, //
-                {",,1", "Cannot process input"}, //
-                {",0,1", "Cannot process input"}, //
-                {"q,w,e", "Cannot process input"}, //
-                {"", "Cannot process input"}, //
-                {"select * from table where id=..,1,2", "Cannot process input"}, // SQL injection check
-                // check negative values
-        };
-    }
-
-    @Test(dataProvider = "negative-cases")
-    public void createTriangleNegativeTest(String val, String message) {
-        System.out.println("Passed Parameter Is : " + val);
-
-        TriangleCreateErrorResponse aas = given()
-                .header("X-User", "3b5151b6-4a02-4189-97eb-b25cc224bc60")
-                .baseUri(BASE_URI)
-                .contentType(ContentType.JSON)
-                .body("{\"separator\": \",\",\"input\": \"" + val + "\"}\n")
-                .when()
-                .post(TRIANGLE)
-                .then()
-                .statusCode(422)
-                .extract()
-                .body().as(TriangleCreateErrorResponse.class);
-
-        assertEquals(aas.getMessage(), message);
-
-    }
-
     @DataProvider(name = "positive-cases")
     public Object[][] positiveTestData() {
         return new Object[][]{
                 //isosceles triangle
-                  {"1,2,2",5},
+                {"1,2,2",5},
 
                 //decimal
                 {"0.1,0.1,0.1",0.3},
