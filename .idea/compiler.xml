@@ -8,7 +8,9 @@
         <outputRelativeToContentRoot value="true" />
         <module name="openTaskArtifact" />
         <module name="openBankRestAssuredTask" />
+        <module name="TriangleTests" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel target="8" />
   </component>
 </project>

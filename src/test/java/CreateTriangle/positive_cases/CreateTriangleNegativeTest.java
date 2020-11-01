@@ -3,7 +3,11 @@ package CreateTriangle.positive_cases;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.parsing.Parser;
-import org.testng.annotations.AfterSuite;
+
+import java.util.Arrays;
+import java.util.stream.*;
+
+import io.restassured.response.ExtractableResponse;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import Entities.Response.*;
@@ -12,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
+import static io.restassured.specification.ProxySpecification.host;
 import static org.testng.Assert.*;
 
 public class CreateTriangleNegativeTest {
@@ -21,7 +26,7 @@ public class CreateTriangleNegativeTest {
     List<String> list = new ArrayList<String>();
 
 
-    @DataProvider(name = "negative-cases")
+    @DataProvider(name = "negative-cases", parallel = true)
     public Object[][] negativeCases() {
         return new Object[][]{
                 {"0,0,0", "Cannot process input"}, //should not be created
@@ -39,15 +44,14 @@ public class CreateTriangleNegativeTest {
                 {"q,w,e", "Cannot process input"}, //
                 {"", "Cannot process input"}, //
                 {"select * from table where id=..,1,2", "Cannot process input"}, // SQL injection check
-                // check negative values
         };
     }
 
-    @Test(dataProvider = "negative-cases")
-    public void createTriangleNegativeTest(String val, String message) {
+    @Test(dataProvider = "negative-cases", threadPoolSize = 20, invocationCount = 1)
+    public void createTriangleNegativeTest(String val, String message) throws Exception {
         System.out.println("Passed Parameter Is : " + val);
 
-        TriangleCreateErrorResponse aas = given()
+        ExtractableResponse a = given()
                 .header("X-User", "3b5151b6-4a02-4189-97eb-b25cc224bc60")
                 .baseUri(BASE_URI)
                 .contentType(ContentType.JSON)
@@ -55,15 +59,20 @@ public class CreateTriangleNegativeTest {
                 .when()
                 .post(TRIANGLE)
                 .then()
-                .statusCode(422)
-                .extract()
-                .body().as(TriangleCreateErrorResponse.class);
+                .extract();
 
-        assertEquals(aas.getMessage(), message);
+        if (a.statusCode() == 422) {
+            TriangleCreateErrorResponse aas = a.body().as(TriangleCreateErrorResponse.class);
+            assertEquals(aas.getMessage(), message);
+
+        } else if (a.statusCode() == 200) {
+            deleteCreatedTriangles(a.body().as(TriangleCreateResponse.class).getId());
+            throw new Exception("Triangle should not be created with parameters: " + val);
+        } else {
+            throw new Exception("Status code is not as expected");
+        }
 
     }
-
-
 
 
     // @AfterSuite
@@ -84,27 +93,31 @@ public class CreateTriangleNegativeTest {
 
         //  }
     }
+
     @Test
     public void deleteAll() {
         RestAssured.defaultParser = Parser.JSON;
+        //RestAssured.proxy = host("localhost").withPort(8888);
+
         // for (int i = 0; i < list.size(); i++) {
         //TriangleCreateResponse triangles=
-                given()
+        List<TriangleCreateResponse> responseAll = Arrays.asList(given().log().all()
                 .header("X-User", "3b5151b6-4a02-4189-97eb-b25cc224bc60")
                 .baseUri(BASE_URI)
-                //  .log().everything()
-                .contentType(ContentType.JSON)
-                .when()
-                // .delete(TRIANGLE + list.get(i))
-                .get(TRIANGLE + "/all")
+                .contentType(ContentType.JSON).
+                        when()
+                .get(TRIANGLE + "all")
 
                 .then()
-                        .statusCode(200)
-                .log().all();
-                //.extract()
+                .log().all().statusCode(200)
+                .extract()
+                .body().as(TriangleCreateResponse[].class));
 
+
+        //.extract()
 
         //  }
+        responseAll.forEach(it -> deleteCreatedTriangles(it.getId()));
     }
 }
 
