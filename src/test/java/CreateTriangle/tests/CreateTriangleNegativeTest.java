@@ -1,11 +1,10 @@
-package CreateTriangle.positive_cases;
+package CreateTriangle.tests;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.parsing.Parser;
 
 import java.util.Arrays;
-import java.util.stream.*;
 
 import io.restassured.response.ExtractableResponse;
 import org.testng.annotations.DataProvider;
@@ -15,8 +14,8 @@ import Entities.Response.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static Helpers.Helpers.*;
 import static io.restassured.RestAssured.given;
-import static io.restassured.specification.ProxySpecification.host;
 import static org.testng.Assert.*;
 
 public class CreateTriangleNegativeTest {
@@ -75,50 +74,7 @@ public class CreateTriangleNegativeTest {
     }
 
 
-    // @AfterSuite
-    public void deleteCreatedTriangles(String id) {
 
-        // for (int i = 0; i < list.size(); i++) {
-        given()
-                .header("X-User", "3b5151b6-4a02-4189-97eb-b25cc224bc60")
-                .baseUri(BASE_URI)
-                //  .log().everything()
-                .contentType(ContentType.JSON)
-                .when()
-                // .delete(TRIANGLE + list.get(i))
-                .delete(TRIANGLE + id)
-                .then()
-                .extract()
-                .body().asString();
-
-        //  }
-    }
-
-    @Test
-    public void deleteAll() {
-        RestAssured.defaultParser = Parser.JSON;
-        //RestAssured.proxy = host("localhost").withPort(8888);
-
-        // for (int i = 0; i < list.size(); i++) {
-        //TriangleCreateResponse triangles=
-        List<TriangleCreateResponse> responseAll = Arrays.asList(given().log().all()
-                .header("X-User", "3b5151b6-4a02-4189-97eb-b25cc224bc60")
-                .baseUri(BASE_URI)
-                .contentType(ContentType.JSON).
-                        when()
-                .get(TRIANGLE + "all")
-
-                .then()
-                .log().all().statusCode(200)
-                .extract()
-                .body().as(TriangleCreateResponse[].class));
-
-
-        //.extract()
-
-        //  }
-        responseAll.forEach(it -> deleteCreatedTriangles(it.getId()));
-    }
 }
 
 
