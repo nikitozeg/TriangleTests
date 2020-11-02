@@ -32,6 +32,9 @@ public class CreateTriangleNegativeTest {
                 {"2,1,1", "Cannot process input"}, //should not be created
                 {"1,2,1", "Cannot process input"}, //should not be created
                 {"1,1,2", "Cannot process input"}, //should not be created
+                {"3,5,2,2", "Cannot process input"}, //should not be created
+                {"3,5,0", "Cannot process input"}, //should not be created
+                {"3,5,", "Cannot process input"}, //should not be created
                 {"0.2,0.1,0.1", "Cannot process input"}, //should not be created
                 {"0.1,0.2,0.1", "Cannot process input"}, //should not be created
                 {"0.1,0.1,0.2", "Cannot process input"}, //should not be created

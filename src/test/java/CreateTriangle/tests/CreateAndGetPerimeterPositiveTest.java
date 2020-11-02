@@ -6,6 +6,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import Entities.Response.*;
 import Helpers.*;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,45 +21,57 @@ public class CreateAndGetPerimeterPositiveTest {
     List<String> list = new ArrayList<String>();
 
 
-    @DataProvider(name = "positive-cases",parallel = true)
+    @DataProvider(name = "positive-cases", parallel = true)
     public Object[][] positiveTestData() {
         return new Object[][]{
                 //isosceles triangle
-                {"1,2,2", 5},
+                {",", "1,2,2", 5},
 
                 //decimal
-                {"0.1,0.1,0.1", 0.3},
+                {",", "0.1,0.1,0.1", 0.3},
 
                 //bigger than INT
-                {"4294967295,4294967295,4294967295", 1.2884901885e10},
+                {",", "4294967295,4294967295,4294967295", 1.2884901885e10},
 
                 //check the work with integer overflow: (2147483647 + 1 = -2147483648, 2147483647 = 2^31 - 1)
-                {"2147483647 ,2147483647 ,1", 4.294967295e9},
+                {",", "2147483647 ,2147483647 ,1", 4.294967295e9},
 
                 // check boundary values for triangle sides
-                {"2,3,5", 10},
-                {"5,2,3", 10},
-                {"3,5,2", 10},
+                {",", "2,3,5", 10},
+                {",", "5,2,3", 10},
+                {",", "3,5,2", 10},
 
                 //Triangle types test
-                {"1,4,-4", 9},            // check negative values
-                {"3,4,5", 12},           // right-angled triangle
-                {"2,3,4", 9},           //  obtuse triangle
-                {"66, 67, 68", 201},           // acute-angled triangle
-                {"6, 6, 6", 18},           // equilateral triangle
-                {"3.0, 5, 3.0", 11}            // double and int
+                {",", "1,4,-4", 9},            // check negative values
+                {",", "3,4,5", 12},           // right-angled triangle
+                {",", "2,3,4", 9},           //  obtuse triangle
+                {",", "66, 67, 68", 201},           // acute-angled triangle
+                {",", "6, 6, 6", 18},           // equilateral triangle
+                {",", "3.0, 5, 3.0", 11},            // double and int
+
+                //separator test  (depends on requirements)
+                {"a", "3a5a2", 10},
+                {"/", "3/5/2", 10},
+                {"*", "3*5*2", 10},
+                {"+", "3+5+2", 10},
+                {"-", "3-5--2", 10},
+                {"!", "3!5!-2", 10},
+                {"", "352", 10},
+                {"$", "3$5$2", 10},
+                {"%", "3%5%2", 10},
+                {"3", "33532", 10},
         };
     }
 
-    @Test(dataProvider = "positive-cases",threadPoolSize=10,invocationCount=1)
-    public void createTrianglePositiveTest(String val, double perimeter) throws InterruptedException {
+    @Test(dataProvider = "positive-cases", threadPoolSize = 10, invocationCount = 1)
+    public void createTrianglePositiveTest(String separator, String val, double perimeter) throws InterruptedException {
         System.out.println("Passed Parameter Is : " + val);
 
         TriangleCreateResponse as = given()
                 .header("X-User", "3b5151b6-4a02-4189-97eb-b25cc224bc60")
                 .baseUri(BASE_URI)
                 .contentType(ContentType.JSON)
-                .body("{\"separator\": \",\",\"input\": \"" + val + "\"}\n")
+                .body("{\"separator\": \"" + separator + "\",\"input\": \"" + val + "\"}\n")
                 .when()
                 .post(TRIANGLE)
                 .then()
@@ -69,7 +82,6 @@ public class CreateAndGetPerimeterPositiveTest {
         assertEquals(Helpers.getPerimeterById(as.getId()), perimeter);
         Helpers.deleteCreatedTriangles(as.getId());
     }
-
 
 
 }
