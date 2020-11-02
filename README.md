@@ -20,7 +20,7 @@
                 {"1,1,2", "Cannot process input"}, //should not be created
 2. triangles with 4 sides should not be created:
 				
-				{"3,5,2,2", "Cannot process input"},
+		{"3,5,2,2", "Cannot process input"},
 3. triangle with 0 side should not be created:
-			{"0,0,0", "Cannot process input"},
+		{"0,0,0", "Cannot process input"},
 
