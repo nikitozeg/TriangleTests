@@ -12,7 +12,8 @@
 #bugs on negative cases:
 1.  the sum of the two sides of the triangle must always be greater than the third side. examples:
 				{"2,1,1", "Cannot process input"}, //should not be created
-                {"1,2,1", "Cannot process input"}, //should not be created
+                //should not be created
+		{"1,2,1", "Cannot process input"}, 
                 {"1,1,2", "Cannot process input"}, //should not be created
 2. triangles with 4 sides should not be created:
 				
